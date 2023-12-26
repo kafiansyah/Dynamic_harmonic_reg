@@ -1,7 +1,32 @@
-echo "# Dynamic_harmonic_reg" >> README.md
-git init
-git add README.md
-git commit -m "first commit"
-git branch -M main
-git remote add origin https://github.com/kafiansyah/Dynamic_harmonic_reg.git
-git push -u origin main
+import numpy as np
+import pandas as pd
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
+import matplotlib.pyplot as plt
+
+# Contoh data hujan harian selama 3 tahun
+np.random.seed(42)
+dates = pd.date_range(start='2022-01-01', end='2024-12-31', freq='D')
+rainfall_data = np.random.normal(loc=10, scale=5, size=len(dates))
+rainfall_series = pd.Series(rainfall_data, index=dates)
+
+# Plot data hujan harian
+rainfall_series.plot(title='Contoh Data Hujan Harian')
+plt.show()
+
+# Membangun model Exponential Smoothing
+model = ExponentialSmoothing(rainfall_series, seasonal='add', seasonal_periods=365)
+fit_model = model.fit()
+
+# Membuat dataframe untuk 1 bulan ke depan
+forecast_dates = pd.date_range(start='2025-01-01', end='2025-01-31', freq='D')
+forecast_df = pd.DataFrame(index=forecast_dates)
+
+# Melakukan prediksi untuk 1 bulan ke depan
+forecast = fit_model.predict(start='2025-01-01', end='2025-01-31')
+
+# Plot hasil prediksi
+plt.plot(rainfall_series.index, rainfall_series.values, label='Data Hujan Harian')
+plt.plot(forecast.index, forecast.values, label='Prediksi Exponential Smoothing')
+plt.title('Prediksi Hujan Harian dengan Exponential Smoothing')
+plt.legend()
+plt.show()
